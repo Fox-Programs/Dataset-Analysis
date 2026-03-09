@@ -216,7 +216,7 @@ with col_stats2:
     st.subheader("Analyse de la Volatilité (std & sum)")
     # 4. groupby avec agrégations multiples (sum, std) (1.0)
     # On calcule la somme des prix (volume du marché) et l'écart-type (volatilité)
-    stats_df = merged_data.groupby('Brand').agg({
+    stats_df = merged_data.groupby('Brandgit ').agg({
         'Retail Price': ['mean', 'std'],
         'Used Price': 'sum'
     }).reset_index()
