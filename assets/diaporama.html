@@ -367,7 +367,37 @@
       font-size: 11px; color: rgba(148,163,184,0.4);
       z-index: 100;
     }
-  </style>
+    /* ─── Media slides ──────────────────────────────────── */
+    .media-slide-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      width: 100%;
+      max-width: 1060px;
+    }
+    .infographie-img {
+      max-width: 100%;
+      max-height: calc(100vh - 220px);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 0 40px rgba(124,58,237,0.25);
+      object-fit: contain;
+    }
+    .video-wrapper {
+      width: 100%;
+      max-width: 900px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 0 40px rgba(124,58,237,0.3);
+      background: #000;
+    }
+    .video-wrapper video {
+      width: 100%;
+      display: block;
+      max-height: calc(100vh - 240px);
+    }  </style>
 </head>
 <body>
 
@@ -673,13 +703,36 @@
     </div>
   </section>
 
+  <!-- ══ Slide 10 – Infographie ══════════════════════════════════════════════ -->
+  <section class="slide" id="s10">
+    <div class="section-label">Critère · Présentation · Infographie</div>
+    <h2 class="slide-title">RTX 4090 : L'Escalade des Prix (2023–2024)</h2>
+    <div class="media-slide-inner">
+      <img class="infographie-img" src="unnamed(1).png" alt="Infographie RTX 4090 – Évolution des prix 2023-2024" />
+    </div>
+  </section>
+
+  <!-- ══ Slide 11 – Vidéo ═════════════════════════════════════════════════════ -->
+  <section class="slide" id="s11">
+    <div class="section-label">Démonstration</div>
+    <h2 class="slide-title">Cartes Graphiques : Prix en Hausse</h2>
+    <div class="media-slide-inner">
+      <div class="video-wrapper">
+        <video controls preload="metadata">
+          <source src="Cartes_Graphiques__Prix_en_Hausse.mp4" type="video/mp4" />
+          Votre navigateur ne supporte pas la lecture vidéo.
+        </video>
+      </div>
+    </div>
+  </section>
+
 </div>
 
 <!-- ── Navigation ── -->
 <div id="nav">
   <button id="btn-prev" onclick="go(-1)" disabled>&#8592;</button>
   <div class="dots" id="dots"></div>
-  <span id="counter">1 / 9</span>
+  <span id="counter">1 / 11</span>
   <button id="btn-next" onclick="go(1)">&#8594;</button>
 </div>
 <div id="slide-num"></div>
@@ -725,6 +778,7 @@
 
   // Init counter
   document.getElementById('slide-num').textContent = '1 / ' + total;
+  document.getElementById('counter').textContent = '1 / ' + total;
 </script>
 </body>
 </html>
