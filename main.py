@@ -49,15 +49,34 @@ st.markdown(
 )
 st.markdown("---")
 
-# ── Load Data ─────────────────────────────────────────────────────────────────
+
+# ── Load & Process Data ───────────────────────────────────────────────────────
 @st.cache_data
 def load_data():
+    # Chargement simulé (remplace par tes fichiers)
     price_data = pd.read_csv('gpu_price_history.csv')
-    metadata   = pd.read_csv('gpu_metadata.csv')
+    metadata = pd.read_csv('gpu_metadata.csv')
+
     price_data['Date'] = pd.to_datetime(price_data['Date'], errors='coerce')
     price_data.dropna(subset=['Date'], inplace=True)
+
     merged = pd.merge(price_data, metadata, on='Name', how='inner')
+
+    # 1. Dérivation de nouvelle colonne & assign (0.5 + 0.5)
+    # On calcule la marge de prix (différence entre prix retail et occasion)
+    merged = merged.assign(Price_Diff=merged['Retail Price'] - merged['Used Price'])
+
+    # 2. apply ou map (0.5)
+    # On crée une catégorie de performance basée sur le score 3DMARK
+    def performance_category(score):
+        if score > 15000: return "Enthusiast"
+        if score > 8000:  return "High-End"
+        return "Budget"
+
+    merged['Tier'] = merged['3DMARK'].apply(performance_category)
+
     return price_data, metadata, merged
+
 
 price_data, metadata, merged_data = load_data()
 
@@ -180,6 +199,31 @@ for spine in ax.spines.values():
     spine.set_edgecolor('#333')
 st.pyplot(fig)
 plt.close(fig)
+
+st.markdown("---")
+
+# ── Statistiques Avancées ──
+st.header("Statistiques Avancées")
+col_stats1, col_stats2 = st.columns(2)
+
+with col_stats1:
+    st.subheader("Répartition par Tier (value_counts)")
+    # 3. value_counts (0.5)
+    tier_counts = merged_data['Tier'].value_counts()
+    st.bar_chart(tier_counts)
+
+with col_stats2:
+    st.subheader("Analyse de la Volatilité (std & sum)")
+    # 4. groupby avec agrégations multiples (sum, std) (1.0)
+    # On calcule la somme des prix (volume du marché) et l'écart-type (volatilité)
+    stats_df = merged_data.groupby('Brand').agg({
+        'Retail Price': ['mean', 'std'],
+        'Used Price': 'sum'
+    }).reset_index()
+
+    # On renomme pour la clarté
+    stats_df.columns = ['Marque', 'Prix Moyen', 'Écart-type (Volatilité)', 'Volume Occasion Total']
+    st.dataframe(stats_df, use_container_width=True)
 
 st.markdown("---")
 
