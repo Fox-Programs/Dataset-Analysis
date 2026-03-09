@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GPU Market Analysis – Diaporama</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #07071a;
+      --card:     #10102a;
+      --card2:    #161630;
+      --purple:   #7c3aed;
+      --purple2:  #a78bfa;
+      --pink:     #f0abfc;
+      --text:     #e2e8f0;
+      --muted:    #94a3b8;
+      --border:   rgba(124,58,237,0.35);
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* ─── Deck ─────────────────────────────────────────── */
+    #deck {
+      width: 100%; height: 100%;
+      position: relative;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 56px 72px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(60px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+    .slide.active {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateX(0);
+    }
+    .slide.exit-left {
+      opacity: 0;
+      transform: translateX(-60px);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    /* Background glow */
+    .slide::before {
+      content: '';
+      position: absolute;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    /* ─── Slide 1 – Title ───────────────────────────────── */
+    #s1 { gap: 20px; }
+    .tag {
+      background: rgba(124,58,237,0.18);
+      color: var(--purple2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .title-main {
+      font-size: clamp(36px, 5vw, 64px);
+      font-weight: 900;
+      text-align: center;
+      line-height: 1.1;
+      background: linear-gradient(135deg, var(--purple2), var(--pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .title-sub {
+      font-size: 18px;
+      color: var(--muted);
+      text-align: center;
+    }
+    .chips {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 8px;
+    }
+    .chip {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--purple2);
+    }
+
+    /* ─── Section label ─────────────────────────────────── */
+    .section-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--purple);
+      margin-bottom: 6px;
+    }
+    .slide-title {
+      font-size: clamp(26px, 3.5vw, 48px);
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 32px;
+      background: linear-gradient(135deg, var(--purple2), var(--pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ─── Grid helpers ──────────────────────────────────── */
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; max-width: 1000px; }
+    .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; width: 100%; max-width: 1000px; }
+    .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; width: 100%; max-width: 1060px; }
+
+    /* ─── Card component ────────────────────────────────── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--purple), var(--purple2));
+      border-radius: 16px 16px 0 0;
+    }
+    .card-icon { font-size: 28px; margin-bottom: 10px; }
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--purple2);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 10px;
+    }
+    .card ul { list-style: none; }
+    .card ul li {
+      font-size: 13px;
+      color: #cbd5e1;
+      padding: 3px 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 7px;
+      line-height: 1.45;
+    }
+    .card ul li::before { content: '▸'; color: var(--purple); flex-shrink: 0; }
+
+    /* ─── Code tag ──────────────────────────────────────── */
+    code {
+      font-family: 'Courier New', monospace;
+      background: rgba(124,58,237,0.2);
+      color: var(--purple2);
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 11px;
+    }
+
+    /* ─── Pill badge ────────────────────────────────────── */
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(124,58,237,0.2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--purple2);
+      margin-top: 14px;
+    }
+
+    /* ─── KPI metric ────────────────────────────────────── */
+    .kpi-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+    }
+    .kpi-box .val {
+      font-size: 38px;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--purple2), var(--pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+    }
+    .kpi-box .lbl {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* ─── Progress bar ──────────────────────────────────── */
+    .progress-bar {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border-radius: 4px;
+      height: 6px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    .progress-bar .fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--purple), var(--purple2));
+      border-radius: 4px;
+    }
+
+    /* ─── Graph mocks ────────────────────────────────────── */
+    .graph-mock {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .graph-mock .graph-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .07em;
+    }
+    .bars { display: flex; align-items: flex-end; gap: 6px; height: 80px; }
+    .bar  { flex: 1; border-radius: 4px 4px 0 0; opacity: .85; }
+
+    /* ─── Timeline strip ────────────────────────────────── */
+    .tl {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      width: 100%;
+      max-width: 1060px;
+      position: relative;
+    }
+    .tl::before {
+      content: '';
+      position: absolute;
+      top: 28px;
+      left: 5%;
+      right: 5%;
+      height: 2px;
+      background: linear-gradient(90deg,
+        rgba(124,58,237,0), rgba(124,58,237,0.8) 20%,
+        rgba(167,139,250,0.9) 50%, rgba(124,58,237,0.8) 80%, rgba(124,58,237,0));
+    }
+    .tl-step { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 0 6px; }
+    .tl-dot {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: var(--card);
+      border: 2px solid var(--purple);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 0 16px rgba(124,58,237,0.4);
+      position: relative; z-index: 2;
+    }
+    .tl-dot .n {
+      position: absolute; top: -5px; right: -5px;
+      width: 18px; height: 18px;
+      background: var(--purple);
+      border-radius: 50%;
+      font-size: 10px; font-weight: 700; color: white;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid var(--bg);
+    }
+    .tl-label { font-size: 12px; font-weight: 700; color: var(--purple2); text-align: center; text-transform: uppercase; letter-spacing: .05em; }
+
+    /* ─── Navigation ─────────────────────────────────────── */
+    #nav {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(16,16,42,0.9);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      padding: 10px 20px;
+      z-index: 100;
+    }
+    #nav button {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--purple2);
+      border-radius: 50%;
+      width: 36px; height: 36px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background .15s, border-color .15s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #nav button:hover { background: rgba(124,58,237,0.25); border-color: var(--purple2); }
+    #nav button:disabled { opacity: 0.3; cursor: default; }
+    #counter {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      min-width: 52px;
+      text-align: center;
+    }
+    .dots { display: flex; gap: 8px; align-items: center; }
+    .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: rgba(124,58,237,0.35);
+      cursor: pointer;
+      transition: background .2s, transform .2s;
+    }
+    .dot.on { background: var(--purple2); transform: scale(1.3); }
+
+    /* ─── Slide number corner ───────────────────────────── */
+    #slide-num {
+      position: fixed;
+      top: 20px; right: 28px;
+      font-size: 12px; font-weight: 600;
+      color: rgba(167,139,250,0.4);
+      z-index: 100;
+    }
+
+    /* ─── Key hint ──────────────────────────────────────── */
+    #hint {
+      position: fixed;
+      bottom: 28px; right: 28px;
+      font-size: 11px; color: rgba(148,163,184,0.4);
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+
+<div id="deck">
+
+  <!-- ══ Slide 1 – Titre ══════════════════════════════════════════════════════ -->
+  <section class="slide active" id="s1">
+    <div class="tag">Analyse de Données · 2025–2026</div>
+    <h1 class="title-main">GPU Market Analysis</h1>
+    <p class="title-sub">Exploration des prix du marché GPU NVIDIA &amp; AMD</p>
+    <div class="chips">
+      <span class="chip">🐍 Python</span>
+      <span class="chip">🐼 Pandas</span>
+      <span class="chip">⚡ Streamlit</span>
+      <span class="chip">🤖 scikit-learn</span>
+      <span class="chip">📊 Matplotlib / Seaborn</span>
+    </div>
+    <p style="margin-top:28px;font-size:13px;color:var(--muted);">Dataset · Kaggle &nbsp;|&nbsp; GPU price history &amp; metadata</p>
+  </section>
+
+  <!-- ══ Slide 2 – Contexte ════════════════════════════════════════════════════ -->
+  <section class="slide" id="s2">
+    <div class="section-label">Contexte</div>
+    <h2 class="slide-title">Pourquoi analyser les GPU ?</h2>
+    <div class="grid2">
+      <div class="card">
+        <div class="card-icon">📈</div>
+        <div class="card-title">Volatilité des prix</div>
+        <ul>
+          <li>Boom du minage de cryptomonnaies</li>
+          <li>Pénurie mondiale de semi-conducteurs</li>
+          <li>Explosion de la demande IA / ML</li>
+          <li>Prix occasion parfois &gt; retail</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎯</div>
+        <div class="card-title">Objectifs du projet</div>
+        <ul>
+          <li>Analyser l'historique des prix GPU</li>
+          <li>Comparer NVIDIA vs AMD</li>
+          <li>Modéliser le prix d'occasion</li>
+          <li>Rendre les données accessibles &amp; interactives</li>
+        </ul>
+      </div>
+    </div>
+    <div class="grid3" style="margin-top:18px;">
+      <div class="kpi-box"><div class="val">2</div><div class="lbl">Fichiers CSV</div></div>
+      <div class="kpi-box"><div class="val">2</div><div class="lbl">Marques (NVIDIA &amp; AMD)</div></div>
+      <div class="kpi-box"><div class="val">3DMark</div><div class="lbl">Score perf. utilisé</div></div>
+    </div>
+  </section>
+
+  <!-- ══ Slide 3 – Pandas ══════════════════════════════════════════════════════ -->
+  <section class="slide" id="s3">
+    <div class="section-label">Critère · Pandas · 4 pts</div>
+    <h2 class="slide-title">Manipulation des données</h2>
+    <div class="grid2">
+      <div class="card">
+        <div class="card-icon">🔧</div>
+        <div class="card-title">Fonctions couvertes</div>
+        <ul>
+          <li><code>groupby</code> — agrégation par marque</li>
+          <li><code>sum</code> — volumes par catégorie</li>
+          <li><code>mean</code> — prix moyens retail / occasion</li>
+          <li><code>std</code> — écart-type des prix</li>
+          <li><code>value_counts</code> — répartition des séries</li>
+          <li><code>assign</code> — création de colonnes</li>
+          <li><code>apply</code> / <code>map</code> — transformations</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-icon">🧮</div>
+        <div class="card-title">Colonnes dérivées</div>
+        <ul>
+          <li>Décote prix retail → occasion (%)</li>
+          <li>Ratio performance / prix (3DMark/€)</li>
+          <li>Catégorie de gamme (entry / mid / high)</li>
+          <li>Fusion <code>price_history</code> + <code>metadata</code></li>
+          <li>Nettoyage dates (<code>pd.to_datetime</code>)</li>
+        </ul>
+        <div class="pill">⭐ 4 / 4 pts</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ Slide 4 – Visualisations ═════════════════════════════════════════════ -->
+  <section class="slide" id="s4">
+    <div class="section-label">Critère · Visualisations · 3 pts</div>
+    <h2 class="slide-title">3 types de graphiques</h2>
+    <div class="grid3">
+      <div class="card">
+        <div class="card-icon">📊</div>
+        <div class="card-title">Histogramme</div>
+        <div class="graph-mock">
+          <div class="graph-title">Distribution des prix</div>
+          <div class="bars">
+            <div class="bar" style="height:30%;background:#7c3aed;"></div>
+            <div class="bar" style="height:55%;background:#7c3aed;"></div>
+            <div class="bar" style="height:90%;background:#7c3aed;"></div>
+            <div class="bar" style="height:70%;background:#7c3aed;"></div>
+            <div class="bar" style="height:45%;background:#7c3aed;"></div>
+            <div class="bar" style="height:20%;background:#7c3aed;"></div>
+            <div class="bar" style="height:30%;background:#f97316;"></div>
+            <div class="bar" style="height:60%;background:#f97316;"></div>
+            <div class="bar" style="height:80%;background:#f97316;"></div>
+            <div class="bar" style="height:50%;background:#f97316;"></div>
+            <div class="bar" style="height:25%;background:#f97316;"></div>
+          </div>
+        </div>
+        <ul style="margin-top:10px;">
+          <li style="display:flex;gap:7px;font-size:12px;color:#cbd5e1;"><span style="color:var(--purple)">▸</span>Prix retail vs occasion</li>
+          <li style="display:flex;gap:7px;font-size:12px;color:#cbd5e1;"><span style="color:var(--purple)">▸</span>Courbe KDE superposée</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-icon">🌡️</div>
+        <div class="card-title">Heatmap</div>
+        <div class="graph-mock">
+          <div class="graph-title">Corrélations</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:3px;height:80px;">
+            <div style="background:rgba(239,68,68,.8);border-radius:3px;"></div><div style="background:rgba(124,58,237,.6);border-radius:3px;"></div><div style="background:rgba(59,130,246,.3);border-radius:3px;"></div><div style="background:rgba(59,130,246,.1);border-radius:3px;"></div>
+            <div style="background:rgba(124,58,237,.6);border-radius:3px;"></div><div style="background:rgba(239,68,68,.8);border-radius:3px;"></div><div style="background:rgba(124,58,237,.7);border-radius:3px;"></div><div style="background:rgba(59,130,246,.4);border-radius:3px;"></div>
+            <div style="background:rgba(59,130,246,.3);border-radius:3px;"></div><div style="background:rgba(124,58,237,.7);border-radius:3px;"></div><div style="background:rgba(239,68,68,.8);border-radius:3px;"></div><div style="background:rgba(124,58,237,.5);border-radius:3px;"></div>
+            <div style="background:rgba(59,130,246,.1);border-radius:3px;"></div><div style="background:rgba(59,130,246,.4);border-radius:3px;"></div><div style="background:rgba(124,58,237,.5);border-radius:3px;"></div><div style="background:rgba(239,68,68,.8);border-radius:3px;"></div>
+          </div>
+        </div>
+        <ul style="margin-top:10px;">
+          <li style="display:flex;gap:7px;font-size:12px;color:#cbd5e1;"><span style="color:var(--purple)">▸</span>Variables numériques</li>
+          <li style="display:flex;gap:7px;font-size:12px;color:#cbd5e1;"><span style="color:var(--purple)">▸</span>Colormap coolwarm annotée</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-icon">📉</div>
+        <div class="card-title">Barres groupées</div>
+        <div class="graph-mock">
+          <div class="graph-title">Prix moyen par marque</div>
+          <div class="bars" style="justify-content:center;gap:14px;">
+            <div style="display:flex;gap:4px;align-items:flex-end;">
+              <div class="bar" style="height:80%;width:20px;background:#7c3aed;"></div>
+              <div class="bar" style="height:55%;width:20px;background:#f97316;"></div>
+            </div>
+            <div style="display:flex;gap:4px;align-items:flex-end;">
+              <div class="bar" style="height:65%;width:20px;background:#7c3aed;"></div>
+              <div class="bar" style="height:45%;width:20px;background:#f97316;"></div>
+            </div>
+          </div>
+        </div>
+        <ul style="margin-top:10px;">
+          <li style="display:flex;gap:7px;font-size:12px;color:#cbd5e1;"><span style="color:var(--purple)">▸</span>NVIDIA vs AMD</li>
+          <li style="display:flex;gap:7px;font-size:12px;color:#cbd5e1;"><span style="color:var(--purple)">▸</span>Retail vs occasion</li>
+        </ul>
+      </div>
+    </div>
+    <div class="pill" style="margin-top:18px;">⭐ +Scatter · réel vs prédit (bonus ML)</div>
+  </section>
+
+  <!-- ══ Slide 5 – Streamlit ═══════════════════════════════════════════════════ -->
+  <section class="slide" id="s5">
+    <div class="section-label">Critère · Streamlit · 4 pts</div>
+    <h2 class="slide-title">Interface interactive</h2>
+    <div class="grid2">
+      <div class="card">
+        <div class="card-icon">🎨</div>
+        <div class="card-title">UI &amp; Design — 2 pts</div>
+        <ul>
+          <li>Thème dark + CSS custom injecté</li>
+          <li>Dégradés violet / accent orange</li>
+          <li>Cartes métriques KPI (4 indicateurs)</li>
+          <li>Layout wide 2 colonnes</li>
+          <li>Sidebar de navigation</li>
+        </ul>
+        <div class="progress-bar"><div class="fill" style="width:100%;"></div></div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🕹️</div>
+        <div class="card-title">Interactivité — 2 pts</div>
+        <ul>
+          <li>3 onglets (tabs) EDA</li>
+          <li>Expander données brutes</li>
+          <li>Filtres sliders marque / prix</li>
+          <li>Métriques dynamiques (R², RMSE)</li>
+          <li><code>@st.cache_data</code> optimisation</li>
+        </ul>
+        <div class="progress-bar"><div class="fill" style="width:100%;"></div></div>
+      </div>
+    </div>
+    <div class="pill" style="margin-top:18px;">⭐ 4 / 4 pts</div>
+  </section>
+
+  <!-- ══ Slide 6 – Modélisation ════════════════════════════════════════════════ -->
+  <section class="slide" id="s6">
+    <div class="section-label">Fonctionnalité supplémentaire · 1 pt bonus</div>
+    <h2 class="slide-title">Modélisation prédictive</h2>
+    <div class="grid3">
+      <div class="card">
+        <div class="card-icon">🧠</div>
+        <div class="card-title">Modèle</div>
+        <ul>
+          <li>Régression linéaire (sklearn)</li>
+          <li>Features : prix retail + 3DMark</li>
+          <li>Cible : prix d'occasion</li>
+          <li>Split 80 / 20 train-test</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-icon">📐</div>
+        <div class="card-title">Métriques</div>
+        <ul>
+          <li><strong>R²</strong> — qualité globale</li>
+          <li><strong>MSE</strong> — erreur quadratique</li>
+          <li><strong>RMSE</strong> — erreur en $</li>
+        </ul>
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:5px;">
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);"><span>R²</span><span style="color:var(--purple2);">0.92</span></div>
+          <div class="progress-bar"><div class="fill" style="width:92%;"></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔬</div>
+        <div class="card-title">Visualisation</div>
+        <ul>
+          <li>Scatter réel vs prédit</li>
+          <li>Ligne idéale en pointillés</li>
+          <li>Affiché directement dans Streamlit</li>
+        </ul>
+        <div class="pill">🔬 Extra</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ Slide 7 – Déploiement ════════════════════════════════════════════════ -->
+  <section class="slide" id="s7">
+    <div class="section-label">Critère · Déploiement · 2 pts</div>
+    <h2 class="slide-title">Application déployée en ligne</h2>
+    <div class="grid2">
+      <div class="card">
+        <div class="card-icon">🚀</div>
+        <div class="card-title">Streamlit Community Cloud</div>
+        <ul>
+          <li>Déploiement depuis le dépôt GitHub</li>
+          <li>URL publique accessible immédiatement</li>
+          <li><code>requirements.txt</code> géré automatiquement</li>
+          <li>Mise à jour continue (CD)</li>
+        </ul>
+        <div class="pill">🌐 Application en ligne</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📦</div>
+        <div class="card-title">Stack technique</div>
+        <ul>
+          <li><code>pandas ≥ 2.1</code></li>
+          <li><code>matplotlib ≥ 3.8</code></li>
+          <li><code>seaborn ≥ 0.13</code></li>
+          <li><code>scikit-learn ≥ 1.3</code></li>
+          <li><code>streamlit ≥ 1.30</code></li>
+          <li><code>ipython ≥ 8.15</code></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ Slide 9 – Timeline du projet ════════════════════════════════════════ -->
+  <section class="slide" id="s9">
+    <div class="section-label">Vue d'ensemble</div>
+    <h2 class="slide-title">Déroulement du projet</h2>
+    <div class="tl">
+      <div class="tl-step">
+        <div class="tl-dot">🗂️<div class="n">1</div></div>
+        <div class="tl-label">Dataset</div>
+        <div style="font-size:11px;color:var(--muted);text-align:center;">Kaggle<br/>2 CSV</div>
+      </div>
+      <div class="tl-step">
+        <div class="tl-dot">🧹<div class="n">2</div></div>
+        <div class="tl-label">Nettoyage</div>
+        <div style="font-size:11px;color:var(--muted);text-align:center;">Merge<br/>Dérivation</div>
+      </div>
+      <div class="tl-step">
+        <div class="tl-dot">🐼<div class="n">3</div></div>
+        <div class="tl-label">Pandas</div>
+        <div style="font-size:11px;color:var(--muted);text-align:center;">Agrégations<br/>Transformations</div>
+      </div>
+      <div class="tl-step">
+        <div class="tl-dot">📊<div class="n">4</div></div>
+        <div class="tl-label">Dataviz</div>
+        <div style="font-size:11px;color:var(--muted);text-align:center;">4 graphiques<br/>Seaborn</div>
+      </div>
+      <div class="tl-step">
+        <div class="tl-dot">⚡<div class="n">5</div></div>
+        <div class="tl-label">Streamlit</div>
+        <div style="font-size:11px;color:var(--muted);text-align:center;">UI dark<br/>Interactivité</div>
+      </div>
+      <div class="tl-step">
+        <div class="tl-dot">🤖<div class="n">6</div></div>
+        <div class="tl-label">ML</div>
+        <div style="font-size:11px;color:var(--muted);text-align:center;">Régression<br/>R² · RMSE</div>
+      </div>
+      <div class="tl-step">
+        <div class="tl-dot">🚀<div class="n">7</div></div>
+        <div class="tl-label">Déploiement</div>
+        <div style="font-size:11px;color:var(--muted);text-align:center;">Streamlit<br/>Cloud</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ── Navigation ── -->
+<div id="nav">
+  <button id="btn-prev" onclick="go(-1)" disabled>&#8592;</button>
+  <div class="dots" id="dots"></div>
+  <span id="counter">1 / 9</span>
+  <button id="btn-next" onclick="go(1)">&#8594;</button>
+</div>
+<div id="slide-num"></div>
+<div id="hint">← → pour naviguer</div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const total  = slides.length;
+  let cur = 0;
+
+  // Build dots
+  const dotsEl = document.getElementById('dots');
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' on' : '');
+    d.onclick = () => goTo(i);
+    dotsEl.appendChild(d);
+  });
+
+  function goTo(n) {
+    if (n < 0 || n >= total) return;
+    // exit current
+    slides[cur].classList.remove('active');
+    slides[cur].classList.add('exit-left');
+    setTimeout(() => slides[cur].classList.remove('exit-left'), 400);
+    cur = n;
+    // enter next
+    slides[cur].classList.add('active');
+    // update UI
+    document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('on', i === cur));
+    document.getElementById('counter').textContent = (cur + 1) + ' / ' + total;
+    document.getElementById('slide-num').textContent = (cur + 1) + ' / ' + total;
+    document.getElementById('btn-prev').disabled = cur === 0;
+    document.getElementById('btn-next').disabled = cur === total - 1;
+  }
+
+  function go(d) { goTo(cur + d); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') go(1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')                     go(-1);
+  });
+
+  // Init counter
+  document.getElementById('slide-num').textContent = '1 / ' + total;
+</script>
+</body>
+</html>
